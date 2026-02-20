@@ -1,0 +1,398 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KnowForge P0 UI Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#111315;
+      --bg-2:#1b1f24;
+      --card:#1e242a;
+      --ink:#e8edf3;
+      --sub:#9aa7b5;
+      --line:#2f3a45;
+      --accent:#ff5d3d;
+      --accent-2:#19c8b4;
+      --warn:#ffb84d;
+      --ok:#5bd66a;
+      --shadow:0 20px 50px rgba(0,0,0,.35);
+      --r:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 600px at -10% -20%, #2f1a16 0%, transparent 50%),
+        radial-gradient(900px 700px at 110% 0%, #0e3c38 0%, transparent 55%),
+        linear-gradient(160deg,#0f1216 0%,#161b21 55%,#101317 100%);
+      font-family:"Manrope","Noto Sans SC",sans-serif;
+      overflow-x:hidden;
+    }
+
+    body::after{
+      content:"";
+      position:fixed; inset:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size:24px 24px;
+      mix-blend-mode:soft-light;
+      opacity:.35;
+    }
+
+    .wrap{max-width:1200px; margin:0 auto; padding:24px}
+    .hero{
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:24px;
+      background:linear-gradient(140deg, rgba(255,93,61,.14), rgba(25,200,180,.08) 55%, rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+      animation:lift .7s ease both;
+    }
+    .hero::before{
+      content:"P0";
+      position:absolute; right:18px; top:-18px;
+      font-family:"Bebas Neue",sans-serif;
+      font-size:120px; letter-spacing:2px;
+      color:rgba(255,255,255,.05);
+      transform:rotate(-8deg);
+    }
+    .kicker{
+      display:inline-flex; gap:8px; align-items:center;
+      font-size:12px; color:#ffd4cb;
+      background:rgba(255,93,61,.15);
+      border:1px solid rgba(255,93,61,.4);
+      border-radius:999px; padding:6px 10px;
+    }
+    h1{
+      margin:12px 0 10px;
+      font-family:"Bebas Neue","Noto Sans SC",sans-serif;
+      font-size:56px; line-height:.95; letter-spacing:1px;
+    }
+    .sub{color:var(--sub); margin:0; max-width:850px}
+
+    .chips{
+      margin-top:14px; display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .chip{
+      font-size:12px; color:#c7d4e1;
+      border:1px solid #3a4652; border-radius:999px; padding:6px 10px;
+      background:rgba(255,255,255,.03);
+    }
+
+    .nav{
+      margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;
+      animation:lift .9s ease both;
+    }
+    .tab{
+      border:1px solid var(--line); background:var(--bg-2); color:#d6e2ef;
+      border-radius:12px; padding:10px 14px; cursor:pointer; font-weight:700;
+      transition:.25s ease;
+    }
+    .tab.active{
+      border-color:transparent;
+      background:linear-gradient(120deg,var(--accent),#ff8b61);
+      color:#fff;
+      transform:translateY(-1px);
+      box-shadow:0 8px 20px rgba(255,93,61,.35);
+    }
+
+    .grid{display:grid; gap:16px; margin-top:16px}
+    .grid.cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      padding:16px;
+      box-shadow:var(--shadow);
+      animation:lift .7s ease both;
+    }
+    .metric{
+      font-family:"Bebas Neue",sans-serif; font-size:42px; letter-spacing:.5px;
+      margin:8px 0 0;
+    }
+
+    .views{margin-top:18px}
+    .view{display:none; animation:fade .35s ease}
+    .view.active{display:block}
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      background:var(--card);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .panel-h{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-bottom:1px solid var(--line);
+      background:linear-gradient(90deg, rgba(255,93,61,.12), rgba(25,200,180,.12));
+    }
+    .panel-h b{font-size:14px}
+    .mini{font-size:12px; color:#bfd0e0}
+
+    .list{
+      display:grid; grid-template-columns:300px 1fr;
+      min-height:420px;
+    }
+    .sidebar{
+      border-right:1px solid var(--line); background:#182028;
+      padding:12px;
+    }
+    .note{
+      border:1px solid #33414f; border-radius:12px; padding:10px; margin-bottom:10px;
+      background:#212b35;
+    }
+    .note h4{margin:0 0 6px; font-size:14px}
+    .note p{margin:0; font-size:12px; color:#a8b5c4}
+    .badge{
+      display:inline-block; margin-top:7px; font-size:11px; padding:3px 8px;
+      border-radius:999px; background:rgba(25,200,180,.18); color:#b6f7ef; border:1px solid rgba(25,200,180,.45);
+    }
+
+    .editor{padding:14px}
+    .split{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    textarea{
+      width:100%; min-height:330px; resize:vertical;
+      background:#151c23; color:#e7eff7; border:1px solid #334250; border-radius:12px; padding:12px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; line-height:1.6;
+    }
+    .preview{
+      border:1px solid #334250; border-radius:12px; padding:12px; background:#151c23;
+      min-height:330px; line-height:1.7;
+    }
+    .preview h3{margin:0 0 8px}
+    .toolbar{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap}
+    .btn{
+      border:1px solid #3c4957; border-radius:10px; padding:8px 10px; background:#1f2730; color:#d4e2f0;
+      font-size:12px; font-weight:700;
+    }
+    .btn.pri{
+      background:linear-gradient(120deg,var(--accent),#ff8b61); border:none; color:white;
+    }
+
+    .search-wrap{padding:14px}
+    .search{
+      width:100%; border:1px solid #3a4652; border-radius:12px; background:#141b22;
+      color:#e6eef8; padding:12px 14px; font-size:14px;
+    }
+    .results{margin-top:12px; display:grid; gap:10px}
+    .result{
+      border:1px solid #394653; background:#1a232d; border-radius:12px; padding:10px 12px;
+    }
+    .result b{font-size:14px}
+    .hl{background:#ffcc6a33; color:#ffd67a; padding:0 2px; border-radius:4px}
+
+    .audit{padding:14px}
+    .timeline{margin:0; padding-left:14px; border-left:2px solid #374451}
+    .timeline li{margin:0 0 12px 0; color:#c8d6e5}
+    .timeline small{color:#8fa1b2}
+
+    .prd{
+      margin-top:16px;
+      border:1px dashed #4c5b69;
+      border-radius:var(--r);
+      background:rgba(255,255,255,.03);
+      padding:16px;
+    }
+    .prd h3{margin:0 0 8px}
+    .prd ul{margin:0; padding-left:18px}
+    .prd li{margin:6px 0; color:#d3dfec}
+
+    @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+    @keyframes lift{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+
+    @media (max-width:980px){
+      .grid.cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .list{grid-template-columns:1fr}
+      .sidebar{border-right:none; border-bottom:1px solid var(--line)}
+      .split{grid-template-columns:1fr}
+      h1{font-size:42px}
+    }
+    @media (max-width:560px){
+      .grid.cards{grid-template-columns:1fr}
+      .wrap{padding:14px}
+      .tab{flex:1}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <span class="kicker">KnowForge · P0 UI 样式稿</span>
+      <h1>Capture · Edit · Search</h1>
+      <p class="sub">
+        基于 PRD 的首版前端原型：聚焦「笔记列表 / 编辑 / 全文检索 / 审计追踪」。
+        本稿用于观察信息架构与交互缺口，不代表最终视觉实现。
+      </p>
+      <div class="chips">
+        <span class="chip">P0: 全文检索（ES）</span>
+        <span class="chip">MCP 回写入口</span>
+        <span class="chip">Git 历史与回滚</span>
+        <span class="chip">单文件原型</span>
+      </div>
+    </section>
+
+    <div class="grid cards">
+      <article class="card"><div class="mini">P0 页面数</div><div class="metric">03</div></article>
+      <article class="card"><div class="mini">核心流程</div><div class="metric">CRUD</div></article>
+      <article class="card"><div class="mini">检索模式</div><div class="metric">FULLTEXT</div></article>
+      <article class="card"><div class="mini">审计策略</div><div class="metric">GIT+LOG</div></article>
+    </div>
+
+    <nav class="nav">
+      <button class="tab active" data-view="v-notes">笔记列表</button>
+      <button class="tab" data-view="v-editor">编辑器</button>
+      <button class="tab" data-view="v-search">全文检索</button>
+      <button class="tab" data-view="v-audit">审计与回滚</button>
+    </nav>
+
+    <main class="views">
+      <section id="v-notes" class="view active panel">
+        <div class="panel-h"><b>Notes / Projects / Wiki</b><span class="mini">P0: 目录浏览 + 基础筛选</span></div>
+        <div class="list">
+          <aside class="sidebar">
+            <div class="note">
+              <h4>Redis 分布式锁实践笔记</h4>
+              <p>Project / updated 09:42</p><span class="badge">#redis #lock</span>
+            </div>
+            <div class="note">
+              <h4>Flink Checkpoint 原理梳理</h4>
+              <p>Wiki / updated 08:10</p><span class="badge">#flink #consistency</span>
+            </div>
+            <div class="note">
+              <h4>今晨闪念：缓存击穿保护</h4>
+              <p>Inbox / updated 07:56</p><span class="badge">#inbox</span>
+            </div>
+          </aside>
+          <div class="editor">
+            <div class="toolbar">
+              <button class="btn">新建笔记</button>
+              <button class="btn">按标签筛选</button>
+              <button class="btn">按类型筛选</button>
+              <button class="btn pri">打开编辑</button>
+            </div>
+            <div class="preview">
+              <h3>选中项预览</h3>
+              <p>在左侧选择笔记后展示摘要、标签、更新时间，以及 “继续编辑 / 查看历史 / 回滚” 快捷入口。</p>
+              <p>这个区块可帮助确认 PRD 是否需要补充：<b>空状态</b>、<b>批量操作</b>、<b>排序规则</b>、<b>最近访问</b>。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-editor" class="view panel">
+        <div class="panel-h"><b>Markdown Editor</b><span class="mini">P0: 编辑 + 保存 + CLI 回写应用</span></div>
+        <div class="editor">
+          <div class="toolbar">
+            <button class="btn">插入代码块</button>
+            <button class="btn">插入 Wiki-Link</button>
+            <button class="btn">预览 Diff</button>
+            <button class="btn pri">保存并提交 Git</button>
+          </div>
+          <div class="split">
+            <textarea># Redis 分布式锁实践笔记
+
+## 背景
+业务侧有并发写冲突，需要互斥控制。
+
+## 方案对比
+- set nx px + lua 解锁
+- Redisson 可重入锁
+
+## 注意点
+1. 锁过期与业务耗时
+2. 主从切换一致性
+3. 监控告警</textarea>
+            <div class="preview">
+              <h3>实时预览</h3>
+              <p>支持代码高亮、链接跳转、段落结构检查。</p>
+              <p><code>[[Flink Checkpoint 原理梳理]]</code></p>
+              <p>建议在 PRD 增加：<b>冲突保存策略</b>（多人/多端或 CLI 并发回写时如何处理）。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-search" class="view panel">
+        <div class="panel-h"><b>Fulltext Search (Elasticsearch)</b><span class="mini">P0: 标题/正文/标签检索 + 高亮</span></div>
+        <div class="search-wrap">
+          <input class="search" value="分布式锁 过期 一致性" />
+          <div class="results">
+            <article class="result">
+              <b>Redis 分布式锁实践笔记</b>
+              <p>... set nx px + lua 方案在主从切换场景需关注 <span class="hl">一致性</span> 风险 ...</p>
+            </article>
+            <article class="result">
+              <b>Flink Checkpoint 原理梳理</b>
+              <p>... 状态快照保障任务恢复后的 exactly-once <span class="hl">一致性</span> ...</p>
+            </article>
+            <article class="result">
+              <b>今晨闪念：缓存击穿保护</b>
+              <p>... 可结合互斥锁避免热点 key 失效时并发回源 ...</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="v-audit" class="view panel">
+        <div class="panel-h"><b>Audit + Git Timeline</b><span class="mini">P0: 每次写入可追溯与回滚</span></div>
+        <div class="audit">
+          <ol class="timeline">
+            <li>
+              note_8f2a: CLI rewrite-apply
+              <br><small>10:21 · before_hash -> after_hash · operator: codex-cli</small>
+            </li>
+            <li>
+              note_8f2a: 手工编辑保存
+              <br><small>10:09 · commit: 9d5a1b2 · operator: web-ui</small>
+            </li>
+            <li>
+              note_8f2a: 创建笔记
+              <br><small>09:42 · commit: 13c00ef · operator: web-ui</small>
+            </li>
+          </ol>
+          <div class="toolbar">
+            <button class="btn">查看某版本 diff</button>
+            <button class="btn">预览回滚结果</button>
+            <button class="btn pri">执行回滚</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="prd">
+      <h3>从 UI 反推建议补充到 PRD（P0）</h3>
+      <ul>
+        <li>定义「空状态 / 无结果状态 / ES异常状态」的 UI 与文案规范。</li>
+        <li>补充「保存冲突策略」：CLI 回写与人工编辑同时发生时的处理规则。</li>
+        <li>补充「检索排序策略」：默认按相关度还是更新时间，是否支持切换。</li>
+        <li>补充「可用性细节」：快捷键（Ctrl/Cmd+S、搜索聚焦）、移动端最小可用布局。</li>
+        <li>补充「审计展示范围」：日志保留周期、可筛选字段、可导出要求。</li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const views = document.querySelectorAll('.view');
+    tabs.forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        tabs.forEach(t=>t.classList.remove('active'));
+        views.forEach(v=>v.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.view).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

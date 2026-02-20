@@ -1,0 +1,1059 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KnowForge P0 Calm Editorial Review</title>
+  <style>
+    :root{
+      --bg:#111315;
+      --bg-soft:#171b20;
+      --card:#1e242a;
+      --card-soft:#202831;
+      --line:#2f3a45;
+      --ink:#e8edf3;
+      --muted:#9aa7b5;
+      --accent:#ff6a3d;
+      --accent-soft:#ff8d66;
+      --ok:#57c48a;
+      --warn:#ffba5f;
+      --err:#ff6f7e;
+      --radius-1:10px;
+      --radius-2:14px;
+      --shadow:0 10px 28px rgba(0,0,0,.28);
+      --anim:180ms ease;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 500px at -10% -10%, rgba(255,106,61,.10), transparent 52%),
+        radial-gradient(1200px 600px at 110% 0%, rgba(255,255,255,.04), transparent 55%),
+        linear-gradient(165deg,#101316 0%,#151a20 45%,#111418 100%);
+      font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px,transparent 1px);
+      background-size:24px 24px;
+    }
+    body.editor-fullscreen{overflow:hidden}
+
+    .wrap{max-width:1220px;margin:0 auto;padding:20px}
+    .sr-only{
+      position:absolute;
+      width:1px;height:1px;
+      margin:-1px;padding:0;border:0;
+      clip:rect(0,0,0,0);overflow:hidden;
+      white-space:nowrap;
+    }
+
+    .topbar{
+      display:grid;
+      grid-template-columns:minmax(240px,1fr) minmax(260px,1.6fr) auto;
+      gap:12px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      box-shadow:var(--shadow);
+      padding:14px;
+    }
+    .brand h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.2px;
+      font-weight:700;
+    }
+    .brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .search-box{
+      position:relative;
+    }
+    .search-box input{
+      width:100%;
+      border:1px solid #3a4653;
+      border-radius:999px;
+      background:#151c23;
+      color:var(--ink);
+      font-size:14px;
+      line-height:1;
+      padding:12px 14px 12px 40px;
+      transition:border-color var(--anim), box-shadow var(--anim);
+    }
+    .search-box input:focus-visible{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(255,106,61,.22);
+    }
+    .search-box svg{
+      position:absolute;
+      left:14px;
+      top:50%;
+      transform:translateY(-50%);
+      opacity:.7;
+    }
+    .primary-btn{
+      border:0;
+      border-radius:12px;
+      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
+      color:#fff;
+      font-weight:700;
+      font-size:14px;
+      padding:11px 16px;
+      cursor:pointer;
+      transition:transform var(--anim), box-shadow var(--anim);
+      box-shadow:0 8px 16px rgba(255,106,61,.25);
+    }
+    .primary-btn:hover{transform:translateY(-1px)}
+    .primary-btn:focus-visible{
+      outline:none;
+      box-shadow:0 0 0 3px rgba(255,106,61,.28),0 8px 16px rgba(255,106,61,.25);
+    }
+
+    .nav{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .tab{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:var(--bg-soft);
+      color:#d5dfeb;
+      font-size:14px;
+      font-weight:700;
+      padding:10px 14px;
+      cursor:pointer;
+      transition:background var(--anim), border-color var(--anim), color var(--anim);
+    }
+    .tab.active{
+      border-color:transparent;
+      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
+      color:#fff;
+    }
+    .tab:focus-visible{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(255,106,61,.22);
+    }
+
+    .panel{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:var(--card);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      animation:fade .18s ease;
+    }
+    .panel-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      background:linear-gradient(90deg, rgba(255,106,61,.10), rgba(255,255,255,.02));
+    }
+    .panel-head b{font-size:14px}
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .workbench{
+      display:grid;
+      grid-template-columns:320px minmax(0,1fr);
+      min-height:420px;
+    }
+    .left{
+      border-right:1px solid var(--line);
+      background:var(--card-soft);
+      padding:12px;
+      overflow:auto;
+    }
+    .filter-row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .chip{
+      border:1px solid #3a4653;
+      border-radius:999px;
+      padding:5px 10px;
+      font-size:12px;
+      color:#c9d6e2;
+      background:rgba(255,255,255,.02);
+      cursor:pointer;
+    }
+    .chip.active{
+      border-color:rgba(255,106,61,.55);
+      background:rgba(255,106,61,.12);
+      color:#ffd4c7;
+    }
+
+    .tree{
+      border:1px solid #33404d;
+      border-radius:12px;
+      background:#1a222b;
+      padding:8px;
+      min-height:320px;
+    }
+    .tree-level{list-style:none;margin:0;padding:0}
+    .tree-children{
+      margin:4px 0 4px 14px;
+      padding-left:10px;
+      border-left:1px dashed #3a4755;
+    }
+    .tree-item{margin:3px 0}
+    .tree-row{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid transparent;
+      border-radius:10px;
+      padding:6px 8px;
+      color:#d8e3ee;
+      cursor:pointer;
+      user-select:none;
+      background:transparent;
+      text-align:left;
+    }
+    .tree-row.folder{font-weight:700;color:#dce7f2}
+    .tree-row.note{font-weight:600;color:#cfdbea}
+    .tree-row.note .tree-meta{
+      margin-left:auto;
+      font-size:11px;
+      color:#93a4b5;
+    }
+    .tree-row.active{
+      border-color:rgba(255,106,61,.65);
+      background:rgba(255,106,61,.12);
+      color:#ffe0d5;
+    }
+    .tree-row:focus-visible{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 2px rgba(255,106,61,.22);
+    }
+    .tree-caret{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:14px;
+      color:#b7c6d6;
+      font-size:12px;
+      flex:0 0 14px;
+    }
+    .tree-item.folder.collapsed > .tree-children{display:none}
+
+    .note{
+      border:1px solid #33404d;
+      border-radius:12px;
+      padding:10px;
+      margin-bottom:9px;
+      background:#1b232c;
+      cursor:pointer;
+      transition:border-color var(--anim), transform var(--anim);
+    }
+    .note:hover{transform:translateY(-1px)}
+    .note.active{border-color:rgba(255,106,61,.65)}
+    .note h3{
+      margin:0 0 6px;
+      font-size:14px;
+      line-height:1.35;
+    }
+    .note p{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .tag{
+      display:inline-block;
+      margin-top:7px;
+      border:1px solid #3d4956;
+      border-radius:999px;
+      padding:2px 8px;
+      color:#c2cfdb;
+      font-size:11px;
+    }
+
+    .right{
+      padding:12px;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:10px;
+      min-width:0;
+    }
+    .tools{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:1px solid #3a4755;
+      border-radius:10px;
+      background:#1a222b;
+      color:#d9e3ee;
+      font-size:12px;
+      font-weight:700;
+      padding:8px 10px;
+      cursor:pointer;
+    }
+    .btn.secondary-entry{
+      color:#f3cabd;
+      border-color:rgba(255,106,61,.42);
+      background:rgba(255,106,61,.09);
+    }
+    .btn.mode.active{
+      border-color:rgba(255,106,61,.60);
+      background:rgba(255,106,61,.16);
+      color:#ffd7ca;
+    }
+    .content{
+      border:1px solid #33414f;
+      border-radius:12px;
+      background:#131b22;
+      padding:14px;
+      line-height:1.75;
+      overflow:auto;
+    }
+    .content h2{
+      margin:0 0 6px;
+      font-size:20px;
+    }
+    .content p{margin:0 0 10px}
+    .meta{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:12px;
+    }
+
+    .editor-shell{
+      border:1px solid #33414f;
+      border-radius:12px;
+      background:#131b22;
+      padding:10px;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:10px;
+      min-height:350px;
+    }
+    .editor-shell.fullscreen{
+      position:fixed;
+      inset:20px;
+      z-index:1200;
+      border-color:#415061;
+      box-shadow:0 24px 48px rgba(0,0,0,.45);
+      background:#101820;
+    }
+    .editor-main{
+      min-height:0;
+      display:grid;
+      grid-template-columns:1fr;
+    }
+    .editor-wrap textarea{
+      width:100%;
+      min-height:320px;
+      border:1px solid #33414f;
+      border-radius:12px;
+      background:#0f161d;
+      color:var(--ink);
+      padding:12px;
+      resize:vertical;
+      font-size:13px;
+      line-height:1.65;
+      font-family:Consolas, "Courier New", monospace;
+    }
+    .editor-wrap textarea:focus-visible{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(255,106,61,.22);
+    }
+    .markdown-preview{
+      display:none;
+      border:1px solid #33414f;
+      border-radius:12px;
+      background:#0f161d;
+      padding:12px;
+      overflow:auto;
+      min-height:320px;
+      line-height:1.7;
+    }
+    .markdown-preview h2,.markdown-preview h3,.markdown-preview h4{margin:0 0 8px}
+    .markdown-preview p{margin:0 0 10px}
+    .markdown-preview ul{margin:0 0 10px;padding-left:18px}
+    .markdown-preview pre{
+      margin:0 0 10px;
+      padding:10px;
+      background:#0a1015;
+      border:1px solid #2d3a46;
+      border-radius:10px;
+      overflow:auto;
+      white-space:pre-wrap;
+    }
+    .save-tip{
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .save-toast{
+      display:none;
+      margin-top:2px;
+      color:#f8d6cb;
+      font-size:12px;
+    }
+    .save-toast.show{display:block}
+
+    .search-area{
+      padding:12px;
+    }
+    .search-area input{
+      width:100%;
+      border:1px solid #3a4653;
+      border-radius:12px;
+      background:#131b22;
+      color:var(--ink);
+      padding:12px;
+      font-size:14px;
+    }
+    .search-area input:focus-visible{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(255,106,61,.22);
+    }
+    .results{
+      margin-top:12px;
+      display:grid;
+      gap:9px;
+    }
+    .result{
+      border:1px solid #34414f;
+      border-radius:12px;
+      background:#18222b;
+      padding:10px 12px;
+    }
+    .result b{font-size:14px}
+    .result p{
+      margin:6px 0 0;
+      color:#d2dde8;
+      font-size:13px;
+    }
+    .hl{
+      background:rgba(255,186,95,.22);
+      color:#ffd49a;
+      border-radius:3px;
+      padding:0 2px;
+    }
+    .empty{
+      display:none;
+      border:1px dashed #415062;
+      border-radius:12px;
+      padding:14px;
+      color:#bfd0e2;
+      background:rgba(255,255,255,.02);
+    }
+    .empty.show{display:block}
+
+    .states{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:rgba(255,255,255,.02);
+      padding:12px;
+    }
+    .states h3{
+      margin:0 0 10px;
+      font-size:15px;
+    }
+    .state-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+    }
+    .state{
+      border:1px solid #374656;
+      border-radius:12px;
+      padding:10px;
+      background:#18212a;
+      min-height:100px;
+    }
+    .state b{font-size:13px}
+    .state p{
+      margin:8px 0 0;
+      color:#c7d4e1;
+      font-size:12px;
+      line-height:1.5;
+    }
+    .state.loading b{color:#dce7f3}
+    .state.error b{color:#ffc3ca}
+    .state.error p{color:#ffb8c1}
+    .dot{
+      display:inline-block;
+      width:8px;height:8px;
+      border-radius:50%;
+      margin-right:6px;
+      transform:translateY(-1px);
+    }
+    .dot.ok{background:var(--ok)}
+    .dot.warn{background:var(--warn)}
+    .dot.err{background:var(--err)}
+
+    .view{display:none}
+    .view.active{display:block}
+
+    @keyframes fade{
+      from{opacity:0;transform:translateY(4px)}
+      to{opacity:1;transform:none}
+    }
+
+    @media (max-width:980px){
+      .topbar{grid-template-columns:1fr}
+      .workbench{grid-template-columns:1fr}
+      .left{border-right:0;border-bottom:1px solid var(--line)}
+      .state-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .editor-shell.fullscreen{inset:10px}
+    }
+    @media (max-width:560px){
+      .wrap{padding:12px}
+      .nav .tab{flex:1}
+      .state-grid{grid-template-columns:1fr}
+      .primary-btn{width:100%}
+      .tree-row.note .tree-meta{display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <h1>KnowForge</h1>
+        <p>把想法、记录与知识整理成可持续迭代的个人工作流。</p>
+      </div>
+      <label class="search-box">
+        <span class="sr-only">全局搜索</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm10.5 3-5.2-5.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input type="text" placeholder="搜索笔记、标签或标题..." />
+      </label>
+      <button class="primary-btn" type="button">新建笔记</button>
+    </header>
+
+    <nav class="nav" aria-label="一级导航">
+      <button class="tab active" type="button" data-view="view-notes">笔记列表</button>
+      <button class="tab" type="button" data-view="view-editor">编辑器</button>
+      <button class="tab" type="button" data-view="view-search">全文检索</button>
+    </nav>
+
+    <main>
+      <section id="view-notes" class="view active panel">
+        <div class="panel-head">
+          <b>笔记列表</b>
+          <span class="hint">多级目录管理（可展开/收起）</span>
+        </div>
+        <div class="workbench">
+          <aside class="left">
+            <div class="filter-row">
+              <button class="chip active" type="button">全部</button>
+              <button class="chip" type="button">项目</button>
+              <button class="chip" type="button">灵感</button>
+              <button class="chip" type="button">最近更新</button>
+            </div>
+            <div id="notes-tree" class="tree" role="tree" aria-label="笔记多级目录"></div>
+          </aside>
+
+          <div class="right">
+            <div class="tools">
+              <button class="btn" type="button">继续编辑</button>
+              <button class="btn secondary-entry" type="button">查看历史</button>
+              <button class="btn secondary-entry" type="button">查看变更</button>
+            </div>
+            <article class="content" id="note-preview">
+              <h2>Redis 分布式锁实践笔记</h2>
+              <div class="meta">项目 · 更新于 09:42</div>
+              <p>围绕锁超时、重入与并发冲突处理，整理了三种可落地方案，并附了适用场景。</p>
+              <p>可以从这里直接进入编辑，或先查看历史版本再决定是否继续修改。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-editor" class="view panel">
+        <div class="panel-head">
+          <b>编辑器</b>
+          <span class="hint">编辑 / 预览 / 全屏</span>
+        </div>
+        <div class="workbench">
+          <aside class="left">
+            <div class="filter-row">
+              <button class="chip active" type="button">当前文档</button>
+              <button class="chip" type="button">最近编辑</button>
+            </div>
+            <article class="note active">
+              <h3>Redis 分布式锁实践笔记</h3>
+              <p>上次保存于 10:09</p>
+              <span class="tag">可继续编辑</span>
+            </article>
+          </aside>
+          <div class="right editor-wrap">
+            <div id="editor-shell" class="editor-shell">
+              <div class="tools">
+                <button id="mode-edit" class="btn mode active" type="button" aria-pressed="true">编辑</button>
+                <button id="mode-preview" class="btn mode" type="button" aria-pressed="false">预览</button>
+                <button id="toggle-fullscreen" class="btn secondary-entry" type="button" aria-label="进入全屏">全屏</button>
+                <button class="btn" type="button">插入标题</button>
+                <button class="btn" type="button">插入链接</button>
+                <button class="btn secondary-entry" type="button">查看历史</button>
+                <button class="btn secondary-entry" type="button">查看变更</button>
+              </div>
+
+              <div class="editor-main">
+                <textarea id="editor-box"># Redis 分布式锁实践笔记
+
+## 背景
+业务存在并发写入冲突，需要明确互斥与超时策略。
+
+## 方案要点
+- 互斥锁与过期时间成对设计
+- 失败重试要有限制，避免放大流量
+- 关键路径保留可观测日志
+
+```sql
+SET lock_key request_id NX PX 5000
+```
+</textarea>
+                <article id="editor-preview" class="markdown-preview"></article>
+              </div>
+
+              <p class="save-tip">快捷键：Ctrl/Cmd+S 触发保存提示。Esc 可退出全屏。</p>
+              <p id="save-toast" class="save-toast">已保存草稿（演示提示）。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-search" class="view panel">
+        <div class="panel-head">
+          <b>全文检索</b>
+          <span class="hint">快速定位相关内容并回到上下文</span>
+        </div>
+        <div class="search-area">
+          <input id="search-input" type="text" value="一致性" aria-label="检索关键字" />
+          <div id="search-results" class="results">
+            <article class="result">
+              <b>Redis 分布式锁实践笔记</b>
+              <p>... 锁过期策略应与业务耗时匹配，避免 <span class="hl">一致性</span> 风险被放大 ...</p>
+            </article>
+            <article class="result">
+              <b>Flink Checkpoint 原理梳理</b>
+              <p>... 状态恢复与快照机制共同保障处理语义的 <span class="hl">一致性</span> ...</p>
+            </article>
+          </div>
+          <div id="search-empty" class="empty">
+            没有找到匹配内容。试试更短的关键词，或切换到标签与标题进行组合检索。
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <section class="states" aria-label="状态示例">
+      <h3>状态区（审查示例）</h3>
+      <div class="state-grid">
+        <article class="state">
+          <b><span class="dot warn"></span>空状态</b>
+          <p>还没有笔记。点击“新建笔记”开始记录你的第一个主题。</p>
+        </article>
+        <article class="state">
+          <b><span class="dot warn"></span>无结果</b>
+          <p>当前条件下未命中内容。你可以放宽关键词或重置筛选。</p>
+        </article>
+        <article class="state loading">
+          <b><span class="dot ok"></span>加载中</b>
+          <p>正在同步内容，请稍候。你依然可以浏览本地已缓存的笔记。</p>
+        </article>
+        <article class="state error">
+          <b><span class="dot err"></span>错误态</b>
+          <p>当前操作暂时失败，请重试。若持续失败，可查看帮助指引。</p>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const views = document.querySelectorAll(".view");
+    const preview = document.getElementById("note-preview");
+    const searchInput = document.getElementById("search-input");
+    const searchResults = document.getElementById("search-results");
+    const searchEmpty = document.getElementById("search-empty");
+    const saveToast = document.getElementById("save-toast");
+
+    const notesTree = document.getElementById("notes-tree");
+    const notesTreeData = [
+      {
+        id: "folder-inbox",
+        type: "folder",
+        name: "Inbox",
+        expanded: true,
+        children: [
+          {
+            id: "note-inbox-1",
+            type: "note",
+            name: "今晨闪念：缓存击穿保护",
+            meta: "灵感 · 07:56",
+            content: "记录了热点失效场景下的降级策略，包含互斥保护和预热思路。"
+          }
+        ]
+      },
+      {
+        id: "folder-projects",
+        type: "folder",
+        name: "Projects",
+        expanded: true,
+        children: [
+          {
+            id: "folder-projects-redis",
+            type: "folder",
+            name: "Redis",
+            expanded: true,
+            children: [
+              {
+                id: "folder-projects-redis-lock",
+                type: "folder",
+                name: "Lock",
+                expanded: true,
+                children: [
+                  {
+                    id: "note-redis-lock-1",
+                    type: "note",
+                    name: "Redis 分布式锁实践笔记",
+                    meta: "项目 · 09:42",
+                    content: "围绕锁超时、重入与并发冲突处理，整理了三种可落地方案，并附了适用场景。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "folder-wiki",
+        type: "folder",
+        name: "Wiki",
+        expanded: true,
+        children: [
+          {
+            id: "folder-wiki-bigdata",
+            type: "folder",
+            name: "BigData",
+            expanded: false,
+            children: [
+              {
+                id: "note-flink-ck",
+                type: "note",
+                name: "Flink Checkpoint 原理梳理",
+                meta: "知识库 · 08:10",
+                content: "梳理状态快照与恢复流程，补充了对一致性保障与容错恢复的说明。"
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const nodeMap = new Map();
+    let selectedNoteId = "note-redis-lock-1";
+
+    function indexTree(nodes){
+      nodes.forEach((node) => {
+        nodeMap.set(node.id, node);
+        if (node.children?.length) {
+          indexTree(node.children);
+        }
+      });
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderTreeLevel(nodes, depth = 1) {
+      const items = nodes.map((node) => {
+        const isFolder = node.type === "folder";
+        const expanded = isFolder ? node.expanded !== false : false;
+        const active = node.type === "note" && node.id === selectedNoteId;
+        const caret = isFolder ? (expanded ? "▾" : "▸") : "•";
+
+        return `
+          <li class="tree-item ${isFolder ? "folder" : "note"} ${isFolder && !expanded ? "collapsed" : ""}" data-node-id="${node.id}" data-node-type="${node.type}">
+            <button
+              type="button"
+              class="tree-row ${node.type} ${active ? "active" : ""}"
+              data-node-id="${node.id}"
+              data-node-type="${node.type}"
+              role="treeitem"
+              aria-level="${depth}"
+              ${isFolder ? `aria-expanded="${expanded}"` : ""}
+            >
+              <span class="tree-caret" aria-hidden="true">${caret}</span>
+              <span class="tree-name">${escapeHtml(node.name)}</span>
+              ${!isFolder && node.meta ? `<span class="tree-meta">${escapeHtml(node.meta)}</span>` : ""}
+            </button>
+            ${isFolder && node.children?.length ? `
+              <ul class="tree-level tree-children" role="group">
+                ${renderTreeLevel(node.children, depth + 1)}
+              </ul>
+            ` : ""}
+          </li>
+        `;
+      }).join("");
+
+      return items;
+    }
+
+    function renderTree() {
+      notesTree.innerHTML = `<ul class="tree-level" role="group">${renderTreeLevel(notesTreeData)}</ul>`;
+    }
+
+    function updatePreview(noteId) {
+      const note = nodeMap.get(noteId);
+      if (!note || note.type !== "note") {
+        preview.innerHTML = `
+          <h2>未选择笔记</h2>
+          <div class="meta">请选择左侧目录中的笔记节点</div>
+          <p>目录节点支持点击展开/收起，支持 Enter/Space 键盘操作。</p>
+        `;
+        return;
+      }
+
+      preview.innerHTML = `
+        <h2>${escapeHtml(note.name)}</h2>
+        <div class="meta">${escapeHtml(note.meta || "项目 · 未标注")}</div>
+        <p>${escapeHtml(note.content || "当前笔记暂无正文，可进入编辑器补充。")}</p>
+        <p>可以从这里直接进入编辑，或先查看历史版本再决定是否继续修改。</p>
+      `;
+    }
+
+    function handleTreeNodeAction(targetRow) {
+      const nodeId = targetRow.dataset.nodeId;
+      const nodeType = targetRow.dataset.nodeType;
+      const node = nodeMap.get(nodeId);
+      if (!node) return;
+
+      if (nodeType === "folder") {
+        node.expanded = !(node.expanded !== false);
+        renderTree();
+        return;
+      }
+
+      selectedNoteId = nodeId;
+      renderTree();
+      updatePreview(nodeId);
+    }
+
+    notesTree.addEventListener("click", (event) => {
+      const row = event.target.closest(".tree-row");
+      if (!row || !notesTree.contains(row)) return;
+      handleTreeNodeAction(row);
+    });
+
+    notesTree.addEventListener("keydown", (event) => {
+      const row = event.target.closest(".tree-row");
+      if (!row || !notesTree.contains(row)) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleTreeNodeAction(row);
+      }
+    });
+
+    const modeEditBtn = document.getElementById("mode-edit");
+    const modePreviewBtn = document.getElementById("mode-preview");
+    const fullscreenBtn = document.getElementById("toggle-fullscreen");
+    const editorShell = document.getElementById("editor-shell");
+    const editorBox = document.getElementById("editor-box");
+    const editorPreview = document.getElementById("editor-preview");
+
+    let editorMode = "edit";
+    let isFullscreen = false;
+
+    function markdownLite(text) {
+      const lines = String(text || "").replace(/\r\n/g, "\n").split("\n");
+      let html = "";
+      let inList = false;
+      let inCode = false;
+      let codeBuffer = [];
+
+      const flushList = () => {
+        if (inList) {
+          html += "</ul>";
+          inList = false;
+        }
+      };
+
+      const flushCode = () => {
+        if (inCode) {
+          html += `<pre><code>${escapeHtml(codeBuffer.join("\n"))}</code></pre>`;
+          inCode = false;
+          codeBuffer = [];
+        }
+      };
+
+      lines.forEach((line) => {
+        if (line.trim().startsWith("```")) {
+          flushList();
+          if (!inCode) {
+            inCode = true;
+            codeBuffer = [];
+          } else {
+            flushCode();
+          }
+          return;
+        }
+
+        if (inCode) {
+          codeBuffer.push(line);
+          return;
+        }
+
+        if (/^###\s+/.test(line)) {
+          flushList();
+          html += `<h4>${escapeHtml(line.replace(/^###\s+/, ""))}</h4>`;
+          return;
+        }
+        if (/^##\s+/.test(line)) {
+          flushList();
+          html += `<h3>${escapeHtml(line.replace(/^##\s+/, ""))}</h3>`;
+          return;
+        }
+        if (/^#\s+/.test(line)) {
+          flushList();
+          html += `<h2>${escapeHtml(line.replace(/^#\s+/, ""))}</h2>`;
+          return;
+        }
+
+        if (/^-\s+/.test(line)) {
+          if (!inList) {
+            html += "<ul>";
+            inList = true;
+          }
+          html += `<li>${escapeHtml(line.replace(/^-\s+/, ""))}</li>`;
+          return;
+        }
+
+        flushList();
+
+        if (!line.trim()) {
+          html += "<p></p>";
+        } else {
+          html += `<p>${escapeHtml(line)}</p>`;
+        }
+      });
+
+      flushList();
+      flushCode();
+      return html || "<p>暂无内容</p>";
+    }
+
+    function renderEditorPreview() {
+      editorPreview.innerHTML = markdownLite(editorBox.value.trim());
+    }
+
+    function setEditorMode(mode) {
+      editorMode = mode;
+      const isEdit = mode === "edit";
+
+      modeEditBtn.classList.toggle("active", isEdit);
+      modePreviewBtn.classList.toggle("active", !isEdit);
+      modeEditBtn.setAttribute("aria-pressed", String(isEdit));
+      modePreviewBtn.setAttribute("aria-pressed", String(!isEdit));
+
+      editorBox.style.display = isEdit ? "block" : "none";
+      editorPreview.style.display = isEdit ? "none" : "block";
+
+      if (!isEdit) {
+        renderEditorPreview();
+      }
+    }
+
+    function setEditorFullscreen(next) {
+      isFullscreen = next;
+      editorShell.classList.toggle("fullscreen", isFullscreen);
+      document.body.classList.toggle("editor-fullscreen", isFullscreen);
+      fullscreenBtn.textContent = isFullscreen ? "退出全屏" : "全屏";
+      fullscreenBtn.setAttribute("aria-label", isFullscreen ? "退出全屏" : "进入全屏");
+    }
+
+    modeEditBtn.addEventListener("click", () => setEditorMode("edit"));
+    modePreviewBtn.addEventListener("click", () => setEditorMode("preview"));
+    fullscreenBtn.addEventListener("click", () => setEditorFullscreen(!isFullscreen));
+    editorBox.addEventListener("input", () => {
+      if (editorMode === "preview") {
+        renderEditorPreview();
+      }
+    });
+
+    function switchView(id) {
+      tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === id));
+      views.forEach((view) => view.classList.toggle("active", view.id === id));
+      if (id !== "view-editor" && isFullscreen) {
+        setEditorFullscreen(false);
+      }
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => switchView(tab.dataset.view));
+    });
+
+    searchInput.addEventListener("input", () => {
+      const keyword = searchInput.value.trim();
+      const hasResult = keyword.length > 0 && !keyword.includes("无结果");
+      searchResults.style.display = hasResult ? "grid" : "none";
+      searchEmpty.classList.toggle("show", !hasResult);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isFullscreen) {
+        setEditorFullscreen(false);
+        return;
+      }
+
+      const saveCombo = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+      if (saveCombo) {
+        e.preventDefault();
+        saveToast.classList.add("show");
+        clearTimeout(window.__saveToastTimer);
+        window.__saveToastTimer = setTimeout(() => {
+          saveToast.classList.remove("show");
+        }, 1400);
+      }
+    });
+
+    indexTree(notesTreeData);
+    renderTree();
+    updatePreview(selectedNoteId);
+    setEditorMode("edit");
+  </script>
+</body>
+</html>
